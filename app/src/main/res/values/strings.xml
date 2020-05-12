@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="spinner_prompt">选择你最爱的水果</string>
+</resources>
