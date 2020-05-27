@@ -2,62 +2,78 @@
 package com.emercy.myapplication;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class MainActivity extends Activity {
 
-    HashMap<String, List<String>> expandableListDetail;
+    private ViewFlipper mViewFlipper;
+    private Context mContext;
+    private float initialX;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 1.设置布局文件并从布局文件中拿到 ExpandableListView 实例；
         setContentView(R.layout.activity_main);
-        ExpandableListView listView = findViewById(R.id.expandableListView);
-        // 2. 获取数据集（实际使用中可能是从网络获取或者本地读取）
-        expandableListDetail = DataCollection.getData();
-        final List<String> heroCategory = new ArrayList<>(expandableListDetail.keySet());
-        // 3. 创建适配器，并为 ExpandableListView 实例设置适配器
-        ExpandableListAdapter adapter = new MyExpandableListAdapter(this, heroCategory, expandableListDetail);
-        listView.setAdapter(adapter);
-        // 4. 为 ExpandableListView 添加相应的事件监听器，并实现监听器接口中的回调方法
-        listView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+        mContext = this;
+        mViewFlipper = this.findViewById(R.id.view_flipper);
 
+        findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onGroupExpand(int groupPosition) {
-                Toast.makeText(getApplicationContext(), heroCategory.get(groupPosition)
-                                + " 列表展开", Toast.LENGTH_SHORT).show();
+            public void onClick(View view) {
+//                mViewFlipper.setAutoStart(true);
+                mViewFlipper.setFlipInterval(2000);
+                mViewFlipper.startFlipping();
+                Toast.makeText(MainActivity.this,
+                        "Automatic view flipping has started", Toast.LENGTH_SHORT).show();
             }
         });
 
-        listView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
 
+        findViewById(R.id.stop).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onGroupCollapse(int groupPosition) {
-                Toast.makeText(getApplicationContext(), heroCategory.get(groupPosition)
-                                + " 列表折叠", Toast.LENGTH_SHORT).show();
-
+            public void onClick(View view) {
+                mViewFlipper.stopFlipping();
+                Toast.makeText(MainActivity.this,
+                        "Automatic view flipping has stopped", Toast.LENGTH_SHORT).show();
             }
         });
 
-        listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                Toast.makeText(getApplicationContext(), heroCategory.get(groupPosition)
-                        + " -> " + expandableListDetail.get(heroCategory.get(groupPosition))
-                        .get(childPosition), Toast.LENGTH_SHORT
-                ).show();
-                return false;
-            }
-        });
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent touchEvent) {
+        switch (touchEvent.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                initialX = touchEvent.getX();
+                break;
+            case MotionEvent.ACTION_UP:
+                float finalX = touchEvent.getX();
+                if (initialX > finalX) {
+                    if (mViewFlipper.getDisplayedChild() == 2)
+                        break;
+
+                    mViewFlipper.setInAnimation(AnimationUtils.loadAnimation(mContext, R.anim.right_in));
+                    mViewFlipper.setOutAnimation(AnimationUtils.loadAnimation(mContext, R.anim.left_out));
+
+                    mViewFlipper.showNext();
+                } else {
+                    if (mViewFlipper.getDisplayedChild() == 0)
+                        break;
+
+                    mViewFlipper.setInAnimation(AnimationUtils.loadAnimation(mContext, R.anim.left_in));
+                    mViewFlipper.setOutAnimation(AnimationUtils.loadAnimation(mContext, R.anim.right_out));
+
+                    mViewFlipper.showPrevious();
+                }
+                break;
+        }
+        return false;
+    }
 }
