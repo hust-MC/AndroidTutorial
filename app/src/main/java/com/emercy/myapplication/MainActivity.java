@@ -6,7 +6,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
@@ -22,16 +21,18 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = this;
-        mViewFlipper = this.findViewById(R.id.view_flipper);
+        mViewFlipper = findViewById(R.id.view_flipper);
 
         findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                mViewFlipper.setAutoStart(true);
+                mViewFlipper.setAutoStart(true);
+                mViewFlipper.setInAnimation(mContext, R.anim.in_from_right);
+                mViewFlipper.setOutAnimation(mContext, R.anim.out_from_left);
                 mViewFlipper.setFlipInterval(2000);
                 mViewFlipper.startFlipping();
                 Toast.makeText(MainActivity.this,
-                        "Automatic view flipping has started", Toast.LENGTH_SHORT).show();
+                        "启动自动播放", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -41,7 +42,7 @@ public class MainActivity extends Activity {
             public void onClick(View view) {
                 mViewFlipper.stopFlipping();
                 Toast.makeText(MainActivity.this,
-                        "Automatic view flipping has stopped", Toast.LENGTH_SHORT).show();
+                        "停止自动播放", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -51,26 +52,26 @@ public class MainActivity extends Activity {
     public boolean onTouchEvent(MotionEvent touchEvent) {
         switch (touchEvent.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                // 记录滑动初始坐标
                 initialX = touchEvent.getX();
                 break;
             case MotionEvent.ACTION_UP:
+                // 记录滑动结束坐标
                 float finalX = touchEvent.getX();
                 if (initialX > finalX) {
-                    if (mViewFlipper.getDisplayedChild() == 2)
-                        break;
-
-                    mViewFlipper.setInAnimation(AnimationUtils.loadAnimation(mContext, R.anim.right_in));
-                    mViewFlipper.setOutAnimation(AnimationUtils.loadAnimation(mContext, R.anim.left_out));
-
-                    mViewFlipper.showNext();
+                    // 初始坐标大于结束坐标，说明为左滑，则播放下一页
+                    if (mViewFlipper.getDisplayedChild() != 2) {
+                        mViewFlipper.setInAnimation(mContext, R.anim.in_from_right);
+                        mViewFlipper.setOutAnimation(mContext, R.anim.out_from_left);
+                        mViewFlipper.showNext();
+                    }
                 } else {
-                    if (mViewFlipper.getDisplayedChild() == 0)
-                        break;
-
-                    mViewFlipper.setInAnimation(AnimationUtils.loadAnimation(mContext, R.anim.left_in));
-                    mViewFlipper.setOutAnimation(AnimationUtils.loadAnimation(mContext, R.anim.right_out));
-
-                    mViewFlipper.showPrevious();
+                    // 初始坐标不大于结束坐标，说明为右滑，则播放上一页
+                    if (mViewFlipper.getDisplayedChild() != 0) {
+                        mViewFlipper.setInAnimation(mContext, R.anim.in_from_left);
+                        mViewFlipper.setOutAnimation(mContext, R.anim.out_from_right);
+                        mViewFlipper.showPrevious();
+                    }
                 }
                 break;
         }

@@ -6,11 +6,11 @@
     tools:showIn="@layout/activity_main">
 
     <ViewFlipper
-        android:inAnimation="@anim/right_in"
-        android:outAnimation="@anim/left_out"
         android:id="@+id/view_flipper"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="fill_parent"
+        android:inAnimation="@anim/in_from_right"
+        android:outAnimation="@anim/out_from_left">
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -30,7 +30,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:gravity="center"
-                android:text="First Child"
+                android:text="第一屏：好好学Android"
                 android:textColor="@android:color/white"
                 android:textSize="18dp"
                 android:textStyle="bold" />
@@ -54,7 +54,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:gravity="center"
-                android:text="Second Child"
+                android:text="第二屏：在慕课网好好学Android"
                 android:textSize="18dp"
                 android:textStyle="bold" />
         </RelativeLayout>
@@ -77,7 +77,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:gravity="center"
-                android:text="Third Child"
+                android:text="第三屏：在慕课网跟着超哥好好学Android"
                 android:textSize="18dp"
                 android:textStyle="bold" />
         </RelativeLayout>

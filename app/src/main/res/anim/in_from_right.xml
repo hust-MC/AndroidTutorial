@@ -2,6 +2,6 @@
     android:shareInterpolator="false">
     <translate
         android:duration="1400"
-        android:fromXDelta="0%"
-        android:toXDelta="-100%p"/>
+        android:fromXDelta="100%"
+        android:fromYDelta="0%" />
 </set>
