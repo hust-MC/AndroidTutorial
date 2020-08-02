@@ -10,7 +10,7 @@ import java.util.List;
 
 public class MyAdapter extends PagerAdapter {
 
-
+    /** 保存所有的 View */
     private final List<View> mView;
 
     public MyAdapter(List<View> view) {
