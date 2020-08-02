@@ -68,6 +68,5 @@ public class MainActivity extends Activity {
 
         mViewPager.setAdapter(new MyAdapter(mView));
         tv.setText(mTitle[0]);
-
     }
 }
