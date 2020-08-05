@@ -3,39 +3,44 @@ package com.emercy.myapplication;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.viewpager.widget.PagerAdapter;
+import android.app.Activity;
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import java.util.List;
+public class MyAdapter extends ArrayAdapter<Model> {
 
-public class MyAdapter extends PagerAdapter {
+    Context mContext;
+    int layoutResourceId;
+    Model data[];
 
-    /** 保存所有的 View */
-    private final List<View> mView;
+    public MyAdapter(Context mContext, int layoutResourceId, Model[] data) {
 
-    public MyAdapter(List<View> view) {
-        mView = view;
-    }
-
-    @NonNull
-    @Override
-    public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        container.addView(mView.get(position));
-        return mView.get(position);
-    }
-
-    @Override
-    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-        container.removeView(mView.get(position));
+        super(mContext, layoutResourceId, data);
+        this.layoutResourceId = layoutResourceId;
+        this.mContext = mContext;
+        this.data = data;
     }
 
     @Override
-    public int getCount() {
-        return mView.size();
-    }
+    public View getView(int position, View convertView, ViewGroup parent) {
 
-    @Override
-    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-        return view == object;
+        View listItem = convertView;
+
+        LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
+        listItem = inflater.inflate(layoutResourceId, parent, false);
+
+        ImageView imageViewIcon = (ImageView) listItem.findViewById(R.id.imageViewIcon);
+        TextView textViewName = (TextView) listItem.findViewById(R.id.textViewName);
+
+        Model folder = data[position];
+
+
+        imageViewIcon.setImageResource(folder.icon);
+        textViewName.setText(folder.name);
+
+        return listItem;
     }
 }

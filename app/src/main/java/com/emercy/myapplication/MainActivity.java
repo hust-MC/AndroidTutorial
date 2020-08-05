@@ -2,71 +2,51 @@
 package com.emercy.myapplication;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ViewFlipper;
+import android.widget.ListView;
+import android.widget.Toolbar;
 
-import androidx.viewpager.widget.ViewPager;
-
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.List;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 
 public class MainActivity extends Activity {
 
-    private ViewPager mViewPager;
-    private String[] mTitle = new String[]{"苹果", "香蕉", "荔枝"};
-    private List<View> mView = new ArrayList<>();
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
+    private ImageView mImage;
+
+    Model[] mItem = new Model[3];
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mTitle = mDrawerTitle = getTitle();
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mImage = findViewById(R.id.imageview);
 
-        final TextView tv = findViewById(R.id.text);
-        mViewPager = findViewById(R.id.view_pager);
-        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mItem[0] = new Model(R.drawable.apple, "苹果");
+        mItem[1] = new Model(R.drawable.peach, "桃子");
+        mItem[2] = new Model(R.drawable.watermelon, "西瓜");
+
+        MyAdapter adapter = new MyAdapter(this, R.layout.list_item, mItem);
+        mDrawerList.setAdapter(adapter);
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                tv.setText(mTitle[position]);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mImage.setImageResource(mItem[position].icon);
             }
         });
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        ImageView view1 = (ImageView) LayoutInflater.from(this).inflate(R.layout.list_item, null);
-        view1.setBackgroundColor(Color.RED);
-        view1.setImageResource(R.drawable.apple);
-        mView.add(view1);
 
-        ImageView view2 = (ImageView) LayoutInflater.from(this).inflate(R.layout.list_item, null);
-        view2.setBackgroundColor(Color.GREEN);
-        view2.setImageResource(R.drawable.banana);
-        mView.add(view2);
-
-        ImageView view3 = (ImageView) LayoutInflater.from(this).inflate(R.layout.list_item, null);
-        view3.setBackgroundColor(Color.BLUE);
-        view3.setImageResource(R.drawable.lychee);
-        mView.add(view3);
-
-        mViewPager.setAdapter(new MyAdapter(mView));
-        tv.setText(mTitle[0]);
     }
+
 }
