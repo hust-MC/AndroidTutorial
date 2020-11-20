@@ -2,65 +2,77 @@
 package com.emercy.myapplication;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
-    float xAxis = 0f;
-    float yAxis = 0f;
 
-    float downXAxis = 0f;
-    float downYAxis = 0f;
+    private static final int MAX = 100;
 
-    TextView downX, downY, moveX, moveY;
-    TextView touch;
+    private ProgressBar progressBar;
+    private Button startProgress;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        progressBar = findViewById(R.id.progressBar);
+        startProgress = findViewById(R.id.start_progress);
+        textView = findViewById(R.id.textView);
+        progressBar.setMax(MAX);
 
-        downX = findViewById(R.id.down_x);
-        downY = findViewById(R.id.down_y);
-        moveX = findViewById(R.id.move_x);
-        moveY = findViewById(R.id.move_y);
-
-        touch = findViewById(R.id.touch);
-
-        touch.setOnTouchListener(new View.OnTouchListener() {
+        startProgress.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                final int actionPeformed = event.getAction();
-
-                switch (actionPeformed) {
-                    case MotionEvent.ACTION_DOWN: {
-                        downXAxis = event.getX();
-                        downYAxis = event.getY();
-
-                        downX.setText("按下的位置横坐标：" + downXAxis);
-                        downY.setText("按下的位置纵坐标：" + downYAxis);
-                        break;
-                    }
-
-                    case MotionEvent.ACTION_MOVE: {
-                        final float x = event.getX();
-                        final float y = event.getY();
-
-                        final float dx = x - downXAxis;
-                        final float dy = y - downYAxis;
-
-                        xAxis += dx;
-                        yAxis += dy;
-
-                        moveX.setText("移动距离的横坐标：" + xAxis);
-                        moveY.setText("移动距离的纵坐标：" + yAxis);
-                        break;
-                    }
-                }
-                return true;
+            public void onClick(View view) {
+                new DownloadTask().execute();
             }
         });
+    }
+
+    // 1、创建Async Task子类
+    private class DownloadTask extends AsyncTask<Integer, Integer, String> {
+
+        // 2、初始化阶段，展示进度条
+        @Override
+        protected void onPreExecute() {
+            progressBar.setVisibility(View.VISIBLE);
+            textView.setVisibility(View.VISIBLE);
+        }
+
+        // 3、执行后台任务
+        @Override
+        protected String doInBackground(Integer... integers) {
+            int i;
+            for (i = 0; i < 100; i++) {
+                try {
+                    // 一秒钟的耗时操作
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                // 4、发布进度
+                publishProgress(i);
+            }
+            return "异步任务已完成";
+        }
+
+        // 5、接收后台任务数据并更新进度条
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            textView.setText("当前进度：" + values[0] + "%");
+            progressBar.setProgress(values[0]);
+        }
+
+        // 6、任务结束
+        @Override
+        protected void onPostExecute(String s) {
+            progressBar.setVisibility(View.GONE);
+            textView.setText(s);
+        }
     }
 }
