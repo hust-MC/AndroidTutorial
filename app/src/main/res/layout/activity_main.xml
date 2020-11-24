@@ -1,38 +1,38 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <ProgressBar
-        android:visibility="gone"
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
-
-    <Button
-        android:id="@+id/start_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/progressBar"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="62dp"
-        android:text="开始任务" />
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context=".MainActivity">
 
     <TextView
-        android:visibility="gone"
+        android:id="@+id/textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="手势处理示例"
+        android:textSize="35sp" />
+
+    <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/start_progress"
-        android:layout_alignBottom="@+id/start_progress"
+        android:layout_below="@+id/textview"
+        android:layout_centerHorizontal="true"
+        android:text="慕课 Android 教程"
+        android:textColor="#ff7aff24"
+        android:textSize="35dp" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="85dp"
-        android:gravity="center"
-        android:text="当前进度：0%"
-        android:textSize="16sp" />
+        android:layout_alignParentBottom="true"
+        android:scaleType="matrix"
+        android:src="@drawable/avatar" />
 
 </RelativeLayout>

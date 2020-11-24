@@ -2,77 +2,45 @@
 package com.emercy.myapplication;
 
 import android.app.Activity;
-import android.os.AsyncTask;
+import android.graphics.Matrix;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
+import android.widget.ImageView;
 
 public class MainActivity extends Activity {
-
-    private static final int MAX = 100;
-
-    private ProgressBar progressBar;
-    private Button startProgress;
-    private TextView textView;
+    private ImageView iv;
+    private Matrix matrix = new Matrix();
+    private float scale = 1f;
+    private ScaleGestureDetector mDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        progressBar = findViewById(R.id.progressBar);
-        startProgress = findViewById(R.id.start_progress);
-        textView = findViewById(R.id.textView);
-        progressBar.setMax(MAX);
 
-        startProgress.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new DownloadTask().execute();
-            }
-        });
+        iv = findViewById(R.id.imageView);
+        // 第2步：创建缩放手势检测器ScaleGestureDetector，用于检测缩放手势
+        mDetector = new ScaleGestureDetector(this, new ScaleListener());
     }
 
-    // 1、创建Async Task子类
-    private class DownloadTask extends AsyncTask<Integer, Integer, String> {
+    // 第3步：覆写onTouchEvent，将触摸事件传递给ScaleGestureDetector
+    public boolean onTouchEvent(MotionEvent ev) {
+        mDetector.onTouchEvent(ev);
+        return true;
+    }
 
-        // 2、初始化阶段，展示进度条
-        @Override
-        protected void onPreExecute() {
-            progressBar.setVisibility(View.VISIBLE);
-            textView.setVisibility(View.VISIBLE);
-        }
+    // 第1步：创建缩放监听器，用于接收缩放事件
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 
-        // 3、执行后台任务
         @Override
-        protected String doInBackground(Integer... integers) {
-            int i;
-            for (i = 0; i < 100; i++) {
-                try {
-                    // 一秒钟的耗时操作
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                // 4、发布进度
-                publishProgress(i);
-            }
-            return "异步任务已完成";
-        }
-
-        // 5、接收后台任务数据并更新进度条
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            textView.setText("当前进度：" + values[0] + "%");
-            progressBar.setProgress(values[0]);
-        }
-
-        // 6、任务结束
-        @Override
-        protected void onPostExecute(String s) {
-            progressBar.setVisibility(View.GONE);
-            textView.setText(s);
+        public boolean onScale(ScaleGestureDetector detector) {
+            // 第4步：实现图片缩放逻辑
+            scale *= detector.getScaleFactor();
+            scale = Math.max(0.1f, Math.min(scale, 5.0f));
+            matrix.setScale(scale, scale);
+            iv.setImageMatrix(matrix);
+            return true;
         }
     }
 }
