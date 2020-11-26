@@ -1,38 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="20dp"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textview"
+    <Button
+        android:id="@+id/buttonStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:text="手势处理示例"
-        android:textSize="35sp" />
+        android:layout_marginTop="74dp"
+        android:text="启动播放器" />
 
-    <TextView
-        android:id="@+id/textView"
+    <Button
+        android:id="@+id/buttonStop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textview"
         android:layout_centerHorizontal="true"
-        android:text="慕课 Android 教程"
-        android:textColor="#ff7aff24"
-        android:textSize="35dp" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_below="@+id/textView"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:scaleType="matrix"
-        android:src="@drawable/avatar" />
-
+        android:layout_centerVertical="true"
+        android:text="停止播放" />
 </RelativeLayout>
