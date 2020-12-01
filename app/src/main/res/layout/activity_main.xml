@@ -1,49 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="30dp">
+    android:padding="30dp"
+    tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Android 教程"
-        android:textSize="30sp" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="文件存储"
+        android:textSize="35sp" />
 
     <TextView
-        android:id="@+id/lesson"
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Content Provider"
-        android:textColor="#ff87ff09"
-        android:textSize="30sp" />
-
-    <EditText
-        android:id="@+id/name"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:hint="姓名："
-        android:textColorHint="@android:color/holo_blue_light" />
-
-    <EditText
-        android:id="@+id/phone"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:hint="电话："
-        android:textColorHint="@android:color/holo_blue_bright" />
+        android:layout_below="@+id/title"
+        android:layout_centerHorizontal="true"
+        android:text="慕课Android教程"
+        android:textColor="#ff7aff24"
+        android:textSize="35sp" />
 
     <Button
-        android:id="@+id/add"
+        android:id="@+id/save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="添加联系人" />
+        android:layout_alignStart="@+id/textView"
+        android:layout_alignParentBottom="true"
+        android:text="保存" />
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="42dp"
+        android:hint="输入要保存的内容"
+        android:textColorHighlight="#ff7eff15"
+        android:textColorHint="#ffff25e6" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/ic_launcher" />
 
     <Button
-        android:id="@+id/get"
+        android:id="@+id/load"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="获取所有联系人信息" />
-</LinearLayout>
+        android:layout_alignTop="@+id/save"
+        android:layout_alignEnd="@+id/editText"
+        android:text="加载文件" />
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editText"
+        android:layout_centerHorizontal="true"
+        android:textColor="#ff5bff1f"
+        android:textSize="25sp" />
+
+</RelativeLayout>
