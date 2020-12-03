@@ -1,33 +1,36 @@
 package com.emercy.myapplication;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import static com.emercy.myapplication.DbHelper.KEY_DESG;
+import static com.emercy.myapplication.DbHelper.KEY_NAME;
+import static com.emercy.myapplication.DbHelper.KEY_POS;
 
 public class SecondActivity extends Activity {
-    SharedPreferences sharedPreferences;
-    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.second);
-        TextView result = findViewById(R.id.result);
-        Button btnLogOut = findViewById(R.id.logout);
-        sharedPreferences = getSharedPreferences("user_details", MODE_PRIVATE);
-        intent = new Intent(SecondActivity.this, MainActivity.class);
-        result.setText("欢迎您, " + sharedPreferences.getString("username", null));
-        btnLogOut.setOnClickListener(new View.OnClickListener() {
+        DbHelper db = new DbHelper(this);
+        ArrayList<HashMap<String, String>> userList = db.GetUsers();
+        ListView lv = (ListView) findViewById(R.id.user_list);
+        ListAdapter adapter = new SimpleAdapter(SecondActivity.this, userList, R.layout.list, new String[]{KEY_NAME, KEY_DESG, KEY_POS}, new int[]{R.id.name, R.id.designation, R.id.location});
+        lv.setAdapter(adapter);
+        Button back = (Button) findViewById(R.id.btnBack);
+        back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.clear();
-                editor.commit();
-                startActivity(intent);
+                finish();
             }
         });
     }
