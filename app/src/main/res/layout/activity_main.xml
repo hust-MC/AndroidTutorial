@@ -5,10 +5,10 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/start_http"
+        android:id="@+id/parse_xml"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="100dp"
-        android:text="发起 Http 请求" />
+        android:text="解析 xml" />
 </LinearLayout>

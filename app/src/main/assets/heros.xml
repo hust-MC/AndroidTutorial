@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<heros>
+    <hero id="1">
+        <name>
+            马超
+        </name>
+        <description>
+            刺客
+        </description>
+    </hero>
+
+    <hero id="2">
+        <name>
+            妲己
+        </name>
+        <description>
+            法师
+        </description>
+    </hero>
+
+    <hero id="3">
+        <name>
+            鲁班
+        </name>
+        <description>
+            射手
+        </description>
+    </hero>
+
+</heros>
