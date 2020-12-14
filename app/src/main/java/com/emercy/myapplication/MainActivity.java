@@ -3,97 +3,49 @@ package com.emercy.myapplication;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class MainActivity extends Activity {
-
+    public static final String JSON_STRING = "{\"Engineers\":[{\"skill\":\"Android\",\"language\":\"Java\",\"years\":\"5\"},{\"skill\":\"iOS\",\"language\":\"Object C\",\"years\":\"2\"},{\"skill\":\"Server\",\"language\":\"php\",\"years\":\"8\"}]}";
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        findViewById(R.id.parse_xml).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.parse).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                XmlPullParserFactory pullParserFactory = null;
-
-                try {
-                    try {
-                        pullParserFactory = XmlPullParserFactory.newInstance();
-                    } catch (XmlPullParserException e) {
-                        e.printStackTrace();
-                    }
-                    XmlPullParser parser = pullParserFactory.newPullParser();
-
-                    InputStream in_s = getApplicationContext().getAssets().open("heros.xml");
-                    parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-                    parser.setInput(in_s, null);
-
-                    ArrayList<Hero> heros = parseXML(parser);
-
-                    String text = "";
-
-                    for (Hero hero : heros) {
-
-                        text += "id : " + hero.getId() + " name : " + hero.getName() + " description : " + hero.getDescription() + "\n";
-                    }
-
-                    Log.d("\nXML Parser", text);
-
-                } catch (XmlPullParserException | IOException e) {
-                    e.printStackTrace();
-                }
+                parse(JSON_STRING);
             }
         });
     }
 
-    private ArrayList<Hero> parseXML(XmlPullParser parser) throws XmlPullParserException, IOException {
-        ArrayList<Hero> heros = null;
-        int eventType = parser.getEventType();
-        Hero hero = null;
+    private void parse(String jsonStr) {
+        TextView textView = (TextView) findViewById(R.id.json);
+        try {
+            JSONObject engineers = new JSONObject(jsonStr);
 
-        // 判断是否结束
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-            String name;
-            switch (eventType) {
-                case XmlPullParser.START_DOCUMENT:
-                    // 处理开始标签，在开始的时候创建英雄List
-                    heros = new ArrayList();
-                    break;
-                case XmlPullParser.START_TAG:
-                    // 处理tag开始，在这里接收英雄及英雄属性
-                    name = parser.getName();
-                    if (name.equals("hero")) {
-                        hero = new Hero();
-                        hero.id = parser.getAttributeValue(null, "id");
-                    } else if (hero != null) {
-                        if (name.equals("name")) {
-                            hero.name = parser.nextText();
-                        } else if (name.equals("description")) {
-                            hero.description = parser.nextText();
-                        }
-                    }
-                    break;
-                case XmlPullParser.END_TAG:
-                    // 标签结束，将英雄添加到英雄列表
-                    name = parser.getName();
-                    if (name.equalsIgnoreCase("hero") && hero != null) {
-                        heros.add(hero);
-                    }
+            JSONArray array = engineers.getJSONArray("Engineers");
+
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject engineer = array.getJSONObject(i);
+                String skill = engineer.getString("skill");
+                String language = engineer.getString("language");
+                int years = engineer.getInt("years");
+
+                stringBuilder.append("Engineer ").append(i)
+                        .append(": skill is ").append(skill)
+                        .append("; language is ").append(language)
+                        .append("; years is ").append(years).append("\n");
+
             }
-            // 处理下一个标签
-            eventType = parser.next();
+            textView.setText(stringBuilder.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return heros;
     }
 }
