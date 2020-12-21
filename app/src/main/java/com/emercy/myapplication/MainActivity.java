@@ -2,50 +2,41 @@
 package com.emercy.myapplication;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.TextView;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
-    public static final String JSON_STRING = "{\"Engineers\":[{\"skill\":\"Android\",\"language\":\"Java\",\"years\":\"5\"},{\"skill\":\"iOS\",\"language\":\"Object C\",\"years\":\"2\"},{\"skill\":\"Server\",\"language\":\"php\",\"years\":\"8\"}]}";
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.parse).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                parse(JSON_STRING);
-            }
-        });
+
+        WebView webView = (WebView) findViewById(R.id.webview);
+
+        webView.setWebViewClient(webViewClient);
+
+        webView.loadUrl("https://www.imooc.com/wiki/androidlesson");
     }
 
-    private void parse(String jsonStr) {
-        TextView textView = (TextView) findViewById(R.id.json);
-        try {
-            JSONObject engineers = new JSONObject(jsonStr);
+    private WebViewClient webViewClient = new WebViewClient() {
+        @Override
+        public void onPageFinished(WebView view, String url) {//页面加载完成
 
-            JSONArray array = engineers.getJSONArray("Engineers");
-
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject engineer = array.getJSONObject(i);
-                String skill = engineer.getString("skill");
-                String language = engineer.getString("language");
-                int years = engineer.getInt("years");
-
-                stringBuilder.append("Engineer ").append(i)
-                        .append(": skill is ").append(skill)
-                        .append("; language is ").append(language)
-                        .append("; years is ").append(years).append("\n");
-
-            }
-            textView.setText(stringBuilder.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-    }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {//页面开始加载
+
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+
+            return super.shouldOverrideUrlLoading(view, url);
+        }
+
+
+    };
 }
