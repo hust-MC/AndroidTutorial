@@ -2,81 +2,137 @@
 package com.emercy.myapplication;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends Activity {
-    static ByteArrayOutputStream byteOut = null;
-    private Bitmap bitmap = null;
+    private Button b1, b2, b3, b4;
+    private MediaPlayer mediaPlayer;
+
+    private double startTime = 0;
+    private double finalTime = 0;
+
+    private Handler myHandler = new Handler();
+    private int forwardTime = 5000;
+    private int backwardTime = 5000;
+    private SeekBar seekbar;
+    private TextView tx1, tx2, tx3;
+
+    public static int oneTimeOnly = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button btn_cut = (Button) findViewById(R.id.button);
-        btn_cut.setOnClickListener(new View.OnClickListener() {
+
+        b1 = (Button) findViewById(R.id.button);
+        b2 = (Button) findViewById(R.id.button2);
+        b3 = (Button) findViewById(R.id.button3);
+        b4 = (Button) findViewById(R.id.button4);
+
+        tx1 = (TextView) findViewById(R.id.textView2);
+        tx2 = (TextView) findViewById(R.id.textView3);
+        tx3 = (TextView) findViewById(R.id.textView4);
+
+        mediaPlayer = MediaPlayer.create(this, R.raw.video);
+        seekbar = (SeekBar) findViewById(R.id.seekBar);
+        seekbar.setClickable(false);
+        b2.setEnabled(false);
+
+        b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                capture();
+                int temp = (int) startTime;
+
+                if ((temp + forwardTime) <= finalTime) {
+                    startTime = startTime + forwardTime;
+                    mediaPlayer.seekTo((int) startTime);
+                    Toast.makeText(getApplicationContext(), "前进5秒", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "前方还剩不到5秒", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        b2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "Pausing sound", Toast.LENGTH_SHORT).show();
+                mediaPlayer.pause();
+                b2.setEnabled(false);
+                b3.setEnabled(true);
+            }
+        });
+
+        b3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "音频播放", Toast.LENGTH_SHORT).show();
+                mediaPlayer.start();
+
+                finalTime = mediaPlayer.getDuration();
+                startTime = mediaPlayer.getCurrentPosition();
+
+                if (oneTimeOnly == 0) {
+                    seekbar.setMax((int) finalTime);
+                    oneTimeOnly = 1;
+                }
+
+                tx2.setText(String.format("%d min, %d sec",
+                        TimeUnit.MILLISECONDS.toMinutes((long) finalTime),
+                        TimeUnit.MILLISECONDS.toSeconds((long) finalTime) -
+                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
+                                        finalTime)))
+                );
+
+                tx1.setText(String.format("%d min, %d sec",
+                        TimeUnit.MILLISECONDS.toMinutes((long) startTime),
+                        TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
+                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
+                                        startTime)))
+                );
+
+                seekbar.setProgress((int) startTime);
+                myHandler.postDelayed(UpdateSongTime, 100);
+                b2.setEnabled(true);
+                b3.setEnabled(false);
+            }
+        });
+
+        b4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int temp = (int) startTime;
+
+                if ((temp - backwardTime) > 0) {
+                    startTime = startTime - backwardTime;
+                    mediaPlayer.seekTo((int) startTime);
+                    Toast.makeText(getApplicationContext(), "后退5秒", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "后方还剩不到5秒", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
 
-    public void capture() {
-        Runnable action = new Runnable() {
-            @Override
-            public void run() {
-                final View contentView = getWindow().getDecorView();
-                try {
-                    bitmap = Bitmap.createBitmap(contentView.getWidth(),
-                            contentView.getHeight(), Bitmap.Config.ALPHA_8);
-                    contentView.draw(new Canvas(bitmap));
-                    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteOut);
-                    save(bitmap);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (null != byteOut)
-                            byteOut.close();
-                        if (null != bitmap && !bitmap.isRecycled()) {
-                            bitmap = null;
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            }
-        };
-        try {
-            action.run();
-        } catch (Exception e) {
-            e.printStackTrace();
+    private Runnable UpdateSongTime = new Runnable() {
+        public void run() {
+            startTime = mediaPlayer.getCurrentPosition();
+            tx1.setText(String.format("%d min, %d sec",
+                    TimeUnit.MILLISECONDS.toMinutes((long) startTime),
+                    TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.
+                                    toMinutes((long) startTime)))
+            );
+            seekbar.setProgress((int) startTime);
+            myHandler.postDelayed(this, 100);
         }
-    }
-
-    private void save(Bitmap b) {
-        FileOutputStream fos;
-        try {
-            fos = new FileOutputStream("sdcard/short.png");
-            boolean success = b.compress(Bitmap.CompressFormat.PNG, 80, fos);
-            fos.flush();
-            fos.close();
-            if (success) {
-                Toast.makeText(MainActivity.this, "截图完成", Toast.LENGTH_SHORT).show();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    };
 }
