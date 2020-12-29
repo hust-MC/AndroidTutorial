@@ -1,138 +1,132 @@
 
 package com.emercy.myapplication;
 
+import android.Manifest;
 import android.app.Activity;
-import android.media.MediaPlayer;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.hardware.Camera;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
-import java.util.concurrent.TimeUnit;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class MainActivity extends Activity {
-    private Button b1, b2, b3, b4;
-    private MediaPlayer mediaPlayer;
 
-    private double startTime = 0;
-    private double finalTime = 0;
+    public static final String CAMERA_PATH = "path";
+    public static final String CAMERA_IMG = "img";
 
-    private Handler myHandler = new Handler();
-    private int forwardTime = 5000;
-    private int backwardTime = 5000;
-    private SeekBar seekbar;
-    private TextView tx1, tx2, tx3;
+    private SurfaceView mSurfaceView;
+    private Button mTakePhoto;
+    private Camera mCamera = null;
+    private SurfaceHolder.Callback mCallback = new SurfaceHolder.Callback() {
+        @Override
+        public void surfaceCreated(SurfaceHolder holder) {
+            startPreview();
+        }
 
-    public static int oneTimeOnly = 0;
+        @Override
+        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder) {
+            stopPreview();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        b1 = (Button) findViewById(R.id.button);
-        b2 = (Button) findViewById(R.id.button2);
-        b3 = (Button) findViewById(R.id.button3);
-        b4 = (Button) findViewById(R.id.button4);
+        getPermission();
 
-        tx1 = (TextView) findViewById(R.id.textView2);
-        tx2 = (TextView) findViewById(R.id.textView3);
-        tx3 = (TextView) findViewById(R.id.textView4);
+        bindViews();
+    }
 
-        mediaPlayer = MediaPlayer.create(this, R.raw.video);
-        seekbar = (SeekBar) findViewById(R.id.seekBar);
-        seekbar.setClickable(false);
-        b2.setEnabled(false);
-
-        b1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int temp = (int) startTime;
-
-                if ((temp + forwardTime) <= finalTime) {
-                    startTime = startTime + forwardTime;
-                    mediaPlayer.seekTo((int) startTime);
-                    Toast.makeText(getApplicationContext(), "前进5秒", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "前方还剩不到5秒", Toast.LENGTH_SHORT).show();
-                }
+    /**
+     * 获取权限
+     */
+    private void getPermission() {
+        if (Build.VERSION.SDK_INT > 22) {
+            if (checkSelfPermission(android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                //先判断有没有权限 ，没有就在这里进行权限的申请
+                requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
+            } else {
+                //说明已经获取到摄像头权限了
+                Log.i("Imooc Camera", "已经获取了权限");
             }
-        });
+        } else {
+            //这个说明系统版本在6.0之下，不需要动态获取权限。
+            Log.i("Imooc Camera", "这个说明系统版本在6.0之下，不需要动态获取权限。");
+        }
+    }
 
-        b2.setOnClickListener(new View.OnClickListener() {
+    private void bindViews() {
+        mSurfaceView = (SurfaceView) findViewById(R.id.sfv_preview);
+        mTakePhoto = (Button) findViewById(R.id.btn_take);
+        mSurfaceView.getHolder().addCallback(mCallback);
+
+        mTakePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Pausing sound", Toast.LENGTH_SHORT).show();
-                mediaPlayer.pause();
-                b2.setEnabled(false);
-                b3.setEnabled(true);
-            }
-        });
-
-        b3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "音频播放", Toast.LENGTH_SHORT).show();
-                mediaPlayer.start();
-
-                finalTime = mediaPlayer.getDuration();
-                startTime = mediaPlayer.getCurrentPosition();
-
-                if (oneTimeOnly == 0) {
-                    seekbar.setMax((int) finalTime);
-                    oneTimeOnly = 1;
-                }
-
-                tx2.setText(String.format("%d min, %d sec",
-                        TimeUnit.MILLISECONDS.toMinutes((long) finalTime),
-                        TimeUnit.MILLISECONDS.toSeconds((long) finalTime) -
-                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
-                                        finalTime)))
-                );
-
-                tx1.setText(String.format("%d min, %d sec",
-                        TimeUnit.MILLISECONDS.toMinutes((long) startTime),
-                        TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
-                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
-                                        startTime)))
-                );
-
-                seekbar.setProgress((int) startTime);
-                myHandler.postDelayed(UpdateSongTime, 100);
-                b2.setEnabled(true);
-                b3.setEnabled(false);
-            }
-        });
-
-        b4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int temp = (int) startTime;
-
-                if ((temp - backwardTime) > 0) {
-                    startTime = startTime - backwardTime;
-                    mediaPlayer.seekTo((int) startTime);
-                    Toast.makeText(getApplicationContext(), "后退5秒", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "后方还剩不到5秒", Toast.LENGTH_SHORT).show();
-                }
+                mCamera.takePicture(null, null, new Camera.PictureCallback() {
+                    @Override
+                    public void onPictureTaken(byte[] data, Camera camera) {
+                        String path;
+                        if (TextUtils.isEmpty(path = savePhoto(data))) {
+                            Intent it = new Intent(MainActivity.this, PhotoActivity.class);
+                            it.putExtra(CAMERA_PATH, path);
+                            startActivity(it);
+                        } else {
+                            Toast.makeText(MainActivity.this, "拍照失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
     }
 
-    private Runnable UpdateSongTime = new Runnable() {
-        public void run() {
-            startTime = mediaPlayer.getCurrentPosition();
-            tx1.setText(String.format("%d min, %d sec",
-                    TimeUnit.MILLISECONDS.toMinutes((long) startTime),
-                    TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
-                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.
-                                    toMinutes((long) startTime)))
-            );
-            seekbar.setProgress((int) startTime);
-            myHandler.postDelayed(this, 100);
+    private String savePhoto(byte[] bytes) {
+        try {
+            File file = File.createTempFile(CAMERA_IMG, "");
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(bytes);
+            fos.flush();
+            fos.close();
+            return file.getAbsolutePath();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    };
+        return "";
+    }
+
+    private void startPreview() {
+        mCamera = Camera.open();
+        try {
+            mCamera.setPreviewDisplay(mSurfaceView.getHolder());
+            mCamera.setDisplayOrientation(90);   //让相机旋转90度
+            mCamera.startPreview();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopPreview() {
+        mCamera.stopPreview();
+        mCamera.release();
+        mCamera = null;
+    }
+
 }
