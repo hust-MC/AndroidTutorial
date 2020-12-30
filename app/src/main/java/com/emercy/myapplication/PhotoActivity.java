@@ -7,14 +7,12 @@ import android.widget.ImageView;
 
 import java.io.File;
 
-import static com.emercy.myapplication.MainActivity.CAMERA_PATH;
-
 public class PhotoActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ImageView img = new ImageView(this);
-        String path = getIntent().getStringExtra(CAMERA_PATH);
+        String path = getIntent().getStringExtra("path");
         if (path != null) {
             img.setImageURI(Uri.fromFile(new File(path)));
         }
