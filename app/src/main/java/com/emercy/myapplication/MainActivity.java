@@ -2,24 +2,10 @@
 package com.emercy.myapplication;
 
 import android.app.Activity;
-import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-
-import java.io.IOException;
-import java.util.Random;
-
-import static android.Manifest.permission.RECORD_AUDIO;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends Activity {
     @Override
